@@ -17,3 +17,8 @@
 In this case Mutex is faster than Semaphore
 
 ### Analasys
+
+Mutex can be synchronized between threads of multiple processes.
+Semaphores can synchronize a specified number of threads to run simultaneously.
+Semaphores allow threads to run until they are less than or equal to a specified number, and prevent threads from running when they attempt to run beyond a specified number.
+So in this case Mutex faster than Semaphore
