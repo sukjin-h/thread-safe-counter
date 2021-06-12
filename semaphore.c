@@ -3,13 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <sys/sem.h>
-#include <sys/time.h>
-
+#include <semaphore.h>
 
 typedef struct __counter_t {
     int value;
-    pthread_mutex_t lock;
+    sem_t semaphore;
 } counter_t;
 
 unsigned int loop_cnt;
@@ -17,25 +15,25 @@ counter_t counter;
 
 void init(counter_t *c) {
     c->value = 0;
-    pthread_mutex_init(&c->lock, NULL);
+    sem_init(&c->semaphore, 0, 1);
 }
 
 void increment(counter_t *c) {
-    pthread_mutex_lock(&c->lock);
+    sem_wait(&c->semaphore);
     c->value++;
-    pthread_mutex_unlock(&c->lock);
+    sem_post(&c->semaphore);
 }
 
 void decrement(counter_t *c) {
-    pthread_mutex_lock(&c->lock);
+    sem_wait(&c->semaphore);
     c->value--;
-    pthread_mutex_unlock(&c->lock);
+    sem_post(&c->semaphore);
 }
 
 int get(counter_t *c) {
-    pthread_mutex_lock(&c->lock);
+    sem_wait(&c->semaphore);
     int rc = c->value;
-    pthread_mutex_unlock(&c->lock);
+    sem_post(&c->semaphore);
     return rc;
 }
 
@@ -47,7 +45,7 @@ void *mythread(void *arg)
     printf("%s: begin\n", letter);
     for (i = 0; i < loop_cnt; i++) {
         increment(&counter);
-    }
+    } 
     printf("%s: done\n", letter);
     return NULL;
 }
